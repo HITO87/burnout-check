@@ -80,8 +80,8 @@ export default async function ResultPage({ params }: Props) {
           </div>
         </div>
 
-        {/* タイプ別イラスト（DALL-E画像差し替え用スロット） */}
-        <div className="absolute inset-0 opacity-10">
+        {/* タイプ別イラスト */}
+        <div className="absolute inset-0 opacity-25">
           <div className="w-full h-full" style={{ backgroundImage: `url(/types/${primaryType}.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
         </div>
       </div>
