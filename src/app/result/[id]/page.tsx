@@ -50,8 +50,15 @@ export default async function ResultPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-[#FFFDF7]">
 
-      {/* ヒーロー: タイプ別グラデーション */}
-      <div className="relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${type.gradientFrom}, ${type.gradientTo})` }}>
+      {/* ヒーロー: タイプ別イラスト + グラデーションオーバーレイ */}
+      <div className="relative overflow-hidden">
+        {/* 背景画像（ベース） */}
+        <div className="absolute inset-0">
+          <div className="w-full h-full" style={{ backgroundImage: `url(/types/${primaryType}.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        </div>
+        {/* グラデーションオーバーレイ（画像の上に半透明で重ねる） */}
+        <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${type.gradientFrom}cc, ${type.gradientTo}cc)` }} />
+
         <div className="max-w-lg mx-auto pt-12 pb-16 px-4 text-center relative z-10">
           <p className="text-white/60 text-xs tracking-wider mb-6">YOUR BURNOUT PROFILE</p>
 
@@ -78,11 +85,6 @@ export default async function ResultPage({ params }: Props) {
           <div className="mt-4 inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-xs font-medium px-4 py-2 rounded-full">
             {severity.emoji} {severity.label}
           </div>
-        </div>
-
-        {/* タイプ別イラスト */}
-        <div className="absolute inset-0 opacity-40">
-          <div className="w-full h-full" style={{ backgroundImage: `url(/types/${primaryType}.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
         </div>
       </div>
 
