@@ -180,10 +180,10 @@ function CortisolRhythm({ type }: { type: BurnoutType }) {
       <div className="p-5">
         {/* 正常パターン */}
         <p className="text-xs font-medium text-gray-600 mb-2">正常なパターン</p>
-        <div className="flex items-end gap-1.5 h-16 mb-1">
+        <div className="flex items-end gap-1.5 mb-1" style={{ height: '64px' }}>
           {normalBars.map((h, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center">
-              <div className="w-full rounded-t-sm bg-emerald-300" style={{ height: `${h}%` }} />
+            <div key={i} className="flex-1 flex items-end">
+              <div className="w-full rounded-t-sm bg-emerald-300" style={{ height: `${Math.round(h * 0.64)}px` }} />
             </div>
           ))}
         </div>
@@ -195,10 +195,10 @@ function CortisolRhythm({ type }: { type: BurnoutType }) {
 
         {/* あなたのパターン */}
         <p className="text-xs font-medium text-gray-600 mb-2">あなたのパターン（推定）</p>
-        <div className="flex items-end gap-1.5 h-16 mb-1">
+        <div className="flex items-end gap-1.5 mb-1" style={{ height: '64px' }}>
           {abnormalBars[type].map((h, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center">
-              <div className="w-full rounded-t-sm" style={{ height: `${h}%`, backgroundColor: h > 80 ? '#ef4444' : h > 50 ? '#f97316' : h > 30 ? '#eab308' : '#9ca3af' }} />
+            <div key={i} className="flex-1 flex items-end">
+              <div className="w-full rounded-t-sm" style={{ height: `${Math.round(h * 0.64)}px`, backgroundColor: h > 80 ? '#ef4444' : h > 50 ? '#f97316' : h > 30 ? '#eab308' : '#9ca3af' }} />
             </div>
           ))}
         </div>
