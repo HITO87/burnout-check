@@ -1,3 +1,5 @@
+'use client'
+import { useState } from 'react'
 import type { BurnoutType } from '@/lib/scoring'
 import { Lock, FileText, Calendar, BookOpen } from 'lucide-react'
 
@@ -40,8 +42,25 @@ const TEASER_CONTENT: Record<BurnoutType, { weeklyPlan: string[]; insight: strin
   },
 }
 
-export default function PaidReportTeaser({ type }: { type: BurnoutType }) {
+export default function PaidReportTeaser({ type, checkResultId }: { type: BurnoutType; checkResultId?: string }) {
+  const [loading, setLoading] = useState(false)
   const content = TEASER_CONTENT[type]
+
+  const handlePurchase = async () => {
+    if (!checkResultId) return
+    setLoading(true)
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ check_result_id: checkResultId }),
+      })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+    } catch {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
@@ -107,9 +126,13 @@ export default function PaidReportTeaser({ type }: { type: BurnoutType }) {
                 ))}
               </div>
             </div>
-            <div className="inline-block px-6 py-3 bg-gray-200 text-gray-500 text-sm font-medium rounded-full">
-              準備中（近日公開）
-            </div>
+            <button
+              onClick={handlePurchase}
+              disabled={loading || !checkResultId}
+              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-full transition-colors shadow-lg shadow-emerald-200/50 disabled:opacity-50"
+            >
+              {loading ? '処理中...' : '回復レポートを受け取る（¥1,480）'}
+            </button>
           </div>
         </div>
       </div>

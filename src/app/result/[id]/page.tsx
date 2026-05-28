@@ -149,7 +149,7 @@ export default async function ResultPage({ params }: Props) {
         <BodyMechanism type={primaryType} />
 
         {/* 有料レポート誘導（blur方式） */}
-        <PaidReportTeaser type={primaryType} />
+        <PaidReportTeaser type={primaryType} checkResultId={id} />
 
         {/* シェア */}
         <div className="text-center mb-8">
