@@ -81,7 +81,7 @@ export default async function ResultPage({ params }: Props) {
         </div>
 
         {/* タイプ別イラスト */}
-        <div className="absolute inset-0 opacity-25">
+        <div className="absolute inset-0 opacity-40">
           <div className="w-full h-full" style={{ backgroundImage: `url(/types/${primaryType}.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
         </div>
       </div>
