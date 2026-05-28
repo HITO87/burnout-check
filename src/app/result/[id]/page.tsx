@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { TYPE_INFO, SEVERITY_INFO } from '@/lib/type-descriptions'
 import type { BurnoutType, Severity } from '@/lib/scoring'
 import type { Metadata } from 'next'
+import BodyMechanism from '@/components/BodyMechanism'
+import PaidReportTeaser from '@/components/PaidReportTeaser'
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -39,59 +41,81 @@ export default async function ResultPage({ params }: Props) {
   const personalScore = Math.round(result.personal_score)
   const workScore = Math.round(result.work_score)
   const interpersonalScore = Math.round(result.interpersonal_score)
-  const type = TYPE_INFO[result.primary_type as BurnoutType]
+  const primaryType = result.primary_type as BurnoutType
+  const type = TYPE_INFO[primaryType]
   const severity = SEVERITY_INFO[result.severity as Severity]
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://burnout.hitone.app'
-  const shareUrl = `${baseUrl}/result/${id}`
   const shareText = `燃え尽き度${score}%、"${type.name}"だった...\nあなたは何タイプ？\n→ ${baseUrl}`
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-4">
-      <div className="max-w-lg mx-auto pt-8 pb-16">
+    <div className="min-h-screen bg-[#FFFDF7]">
 
-        {/* スコア */}
-        <div className="text-center mb-8">
-          <p className="text-xs text-gray-400 mb-2">あなたの燃え尽き度</p>
-          <div className="relative w-40 h-40 mx-auto mb-4">
+      {/* ヒーロー: タイプ別グラデーション */}
+      <div className="relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${type.gradientFrom}, ${type.gradientTo})` }}>
+        <div className="max-w-lg mx-auto pt-12 pb-16 px-4 text-center relative z-10">
+          <p className="text-white/60 text-xs tracking-wider mb-6">YOUR BURNOUT PROFILE</p>
+
+          {/* スコアゲージ */}
+          <div className="relative w-36 h-36 mx-auto mb-6">
             <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-              <circle cx="50" cy="50" r="42" fill="none" stroke="#f3f4f6" strokeWidth="8" />
+              <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="6" />
               <circle
-                cx="50" cy="50" r="42" fill="none"
-                stroke={score >= 76 ? '#dc2626' : score >= 51 ? '#f97316' : score >= 26 ? '#eab308' : '#10b981'}
-                strokeWidth="8" strokeLinecap="round"
+                cx="50" cy="50" r="42" fill="none" stroke="white" strokeWidth="6" strokeLinecap="round"
                 strokeDasharray={`${(score / 100) * 264} 264`}
               />
             </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-4xl font-bold text-gray-800">{score}</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-4xl font-bold text-white">{score}</span>
+              <span className="text-white/60 text-[10px]">/ 100</span>
             </div>
           </div>
-          <p className={`text-sm font-medium ${severity.color}`}>
+
+          {/* タイプ名 */}
+          <h1 className="text-2xl font-bold text-white mb-2">{type.name}</h1>
+          <p className="text-white/70 text-xs">{type.nameEn} Type</p>
+
+          {/* 重症度 */}
+          <div className="mt-4 inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-xs font-medium px-4 py-2 rounded-full">
             {severity.emoji} {severity.label}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">{severity.message}</p>
+          </div>
+        </div>
+
+        {/* タイプ別イラスト（DALL-E画像差し替え用スロット） */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="w-full h-full" style={{ backgroundImage: `url(/types/${primaryType}.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        </div>
+      </div>
+
+      <div className="max-w-lg mx-auto px-4 -mt-4 pb-16 relative z-10">
+
+        {/* 重症度メッセージ */}
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-6">
+          <p className="text-sm text-gray-700 leading-relaxed">{severity.message}</p>
         </div>
 
         {/* 3下位尺度 */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm mb-6">
-          <p className="text-xs text-gray-400 mb-4">内訳</p>
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-6">
+          <p className="text-xs text-gray-400 tracking-wider mb-4">SUBSCALES</p>
           <div className="space-y-4">
             {[
-              { label: '心身の疲労', score: personalScore },
-              { label: '仕事との関係', score: workScore },
-              { label: '人との関係', score: interpersonalScore },
+              { label: '心身の疲労', sub: 'Personal', score: personalScore },
+              { label: '仕事との関係', sub: 'Work-related', score: workScore },
+              { label: '人との関係', sub: 'Interpersonal', score: interpersonalScore },
             ].map(item => (
               <div key={item.label}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm text-gray-600">{item.label}</span>
-                  <span className="text-sm font-medium text-gray-800">{item.score}%</span>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div>
+                    <span className="text-sm text-gray-700 font-medium">{item.label}</span>
+                    <span className="text-[10px] text-gray-400 ml-2">{item.sub}</span>
+                  </div>
+                  <span className="text-sm font-bold text-gray-800">{item.score}%</span>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full rounded-full transition-all duration-700"
+                    className="h-full rounded-full"
                     style={{
                       width: `${item.score}%`,
-                      backgroundColor: item.score >= 76 ? '#dc2626' : item.score >= 51 ? '#f97316' : item.score >= 26 ? '#eab308' : '#10b981',
+                      background: item.score >= 76 ? 'linear-gradient(90deg, #f97316, #dc2626)' : item.score >= 51 ? 'linear-gradient(90deg, #eab308, #f97316)' : item.score >= 26 ? 'linear-gradient(90deg, #10b981, #eab308)' : '#10b981',
                     }}
                   />
                 </div>
@@ -100,39 +124,43 @@ export default async function ResultPage({ params }: Props) {
           </div>
         </div>
 
-        {/* タイプ */}
-        <div className={`rounded-2xl p-6 mb-6 ${type.bgColor}`}>
-          <p className="text-xs text-gray-400 mb-2">あなたのタイプ</p>
-          <h2 className={`text-xl font-bold mb-3 ${type.color}`}>
-            {type.emoji} {type.name}
-          </h2>
-          <p className="text-sm text-gray-700 leading-relaxed mb-4">{type.body}</p>
-          <div className="bg-white/60 rounded-xl p-4">
-            <p className="text-xs text-gray-500 font-medium mb-2">あなたの身体で起きていること</p>
-            <p className="text-xs text-gray-600 leading-relaxed">{type.mechanism}</p>
+        {/* タイプ詳細 */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+          {/* タイプカードヘッダー */}
+          <div className="p-5 border-b border-gray-50" style={{ background: `linear-gradient(135deg, ${type.gradientFrom}08, ${type.gradientTo}08)` }}>
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg" style={{ background: `linear-gradient(135deg, ${type.gradientFrom}, ${type.gradientTo})` }}>
+                {type.nameEn.charAt(0)}
+              </div>
+              <div>
+                <h2 className={`text-lg font-bold ${type.color}`}>{type.name}</h2>
+                <p className="text-xs text-gray-400">{type.nameEn} Type</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-5">
+            <p className="text-sm text-gray-700 leading-relaxed">{type.body}</p>
           </div>
         </div>
 
+        {/* 身体メカニズム図解 */}
+        <BodyMechanism type={primaryType} />
+
+        {/* 有料レポート誘導（blur方式） */}
+        <PaidReportTeaser type={primaryType} />
+
         {/* シェア */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-8">
           <a
             href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors shadow-sm"
           >
-            Xでシェアする
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            シェアする
           </a>
           <p className="text-xs text-gray-400 mt-2">あなたのタイプを友達と比べてみよう</p>
-        </div>
-
-        {/* 有料レポートCTA（Phase 2用プレースホルダー） */}
-        <div className="bg-emerald-50 rounded-2xl p-6 mb-6 text-center">
-          <p className="text-sm font-medium text-emerald-800 mb-2">あなた専用の回復ロードマップ</p>
-          <p className="text-xs text-emerald-600 mb-4">詳細な構造分析・30日間の回復プラン・タイプ別のアドバイスが含まれます</p>
-          <div className="inline-block px-6 py-3 bg-emerald-200 text-emerald-700 text-sm font-medium rounded-full">
-            準備中（近日公開）
-          </div>
         </div>
 
         {/* 76-100: 専門機関案内 */}
@@ -144,8 +172,7 @@ export default async function ResultPage({ params }: Props) {
             </p>
             <a
               href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryou/teikyouseido/index.html"
-              target="_blank"
-              rel="noopener noreferrer"
+              target="_blank" rel="noopener noreferrer"
               className="text-xs text-red-700 underline"
             >
               医療機関を探す（厚生労働省）→
@@ -162,9 +189,8 @@ export default async function ResultPage({ params }: Props) {
           </p>
         </div>
 
-        {/* もう一度チェック */}
         <div className="text-center mt-6">
-          <a href="/check" className="text-xs text-gray-400 hover:text-emerald-600 underline">
+          <a href="/check" className="text-xs text-gray-400 hover:text-emerald-600 underline transition-colors">
             もう一度チェックする
           </a>
         </div>

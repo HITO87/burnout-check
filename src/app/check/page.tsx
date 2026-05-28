@@ -45,10 +45,22 @@ export default function CheckPage() {
 
   if (submitting) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-sm text-gray-500">結果を分析しています...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4">
+        <div className="text-center max-w-xs">
+          <div className="w-12 h-12 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+          <p className="text-base font-medium text-gray-800 mb-2">あなたの回答を分析しています</p>
+          <div className="space-y-2 mt-6 text-left">
+            {[
+              '燃え尽き度スコアを算出中...',
+              '3つの下位尺度を分析中...',
+              'バーンアウトタイプを判定中...',
+            ].map((step, i) => (
+              <div key={i} className="flex items-center gap-3 text-xs text-gray-400 animate-pulse" style={{ animationDelay: `${i * 0.5}s` }}>
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                {step}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     )
