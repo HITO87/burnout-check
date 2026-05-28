@@ -54,7 +54,7 @@ export default async function ResultPage({ params }: Props) {
       <div className="relative overflow-hidden">
         {/* 背景画像（ベース） */}
         <div className="absolute inset-0">
-          <div className="w-full h-full" style={{ backgroundImage: `url(/types/${primaryType}.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          <div className="w-full h-full" style={{ backgroundImage: `url(/types/${primaryType}.png)`, backgroundSize: 'cover', backgroundPosition: 'center 60%' }} />
         </div>
         {/* グラデーションオーバーレイ（画像の上に半透明で重ねる） */}
         <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${type.gradientFrom}cc, ${type.gradientTo}cc)` }} />
