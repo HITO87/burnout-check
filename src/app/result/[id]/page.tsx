@@ -19,12 +19,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://burnout.hitone.app'
 
   return {
-    title: `燃え尽き度${score}% — ${type.name} | HITONE`,
-    description: 'あなたの燃え尽きタイプは？8分の無料チェックで科学的に分析',
+    title: `${type.name} — 隠された強み：${type.hiddenStrength} | HITONE`,
+    description: `${type.catchphrase}`,
     openGraph: {
-      title: `燃え尽き度${score}% — ${type.name} | HITONE`,
-      description: 'あなたの燃え尽きタイプは？8分の無料チェックで科学的に分析',
-      images: [`${baseUrl}/api/og?type=${data.primary_type}&score=${score}`],
+      title: `${type.name} — 隠された強み：${type.hiddenStrength} | HITONE`,
+      description: `${type.catchphrase}`,
+      images: [`${baseUrl}/api/og?type=${data.primary_type}`],
     },
     twitter: { card: 'summary_large_image' },
   }
@@ -45,7 +45,7 @@ export default async function ResultPage({ params }: Props) {
   const type = TYPE_INFO[primaryType]
   const severity = SEVERITY_INFO[result.severity as Severity]
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://burnout.hitone.app'
-  const shareText = `燃え尽きタイプ診断やったら【${type.name}】だった。「${type.hiddenStrength}の使いすぎ」って言われて刺さった…\nあなたは何タイプ？\n→ ${baseUrl}`
+  const shareText = `私の隠された強みは「${type.hiddenStrength}」でした。\nあなたの "使いすぎている才能" は何？\n→ ${baseUrl}`
 
   return (
     <div className="min-h-screen bg-[#FFFDF7]">
