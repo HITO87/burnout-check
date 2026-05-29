@@ -100,7 +100,7 @@ export const SEVERITY_INFO: Record<Severity, { label: string; emoji: string; col
     label: '低い',
     emoji: '🟢',
     color: 'text-emerald-600',
-    message: '現時点では燃え尽きの傾向は低い水準です。このバランスを維持していきましょう。',
+    message: '現時点では燃え尽きの傾向は低い水準です。ただし、あなたのタイプを知っておくことで予防に役立ちます。',
   },
   moderate: {
     label: '中程度',
