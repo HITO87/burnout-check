@@ -47,7 +47,7 @@ export default async function ReportViewPage({ params }: Props) {
   }
 
   const result = report.check_results
-  const type = TYPE_INFO[(result?.primary_type ?? 'balanced') as BurnoutType]
+  const type = TYPE_INFO[(result?.primary_type ?? 'devotee') as BurnoutType]
 
   // マークダウンの見出し（##）をHTMLに変換
   const formatContent = (text: string) => {

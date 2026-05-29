@@ -19,11 +19,11 @@ function WaveDividerReverse({ flip }: { flip?: boolean }) {
 }
 
 export default function LandingPage() {
-  const types = ['frenetic', 'underchallenged', 'wornout'] as const
+  const types = ['devotee', 'perfectionist', 'empath', 'executor', 'harmonizer', 'seeker'] as const
 
   const features = [
     { icon: BarChart3, label: '燃え尽き度スコア', desc: '0〜100で数値化' },
-    { icon: Search, label: 'タイプ判定', desc: '3タイプから特定' },
+    { icon: Search, label: 'タイプ判定', desc: '6タイプから特定' },
     { icon: Brain, label: '身体のメカニズム', desc: '何が起きているか図解' },
     { icon: Map, label: '回復のヒント', desc: 'タイプ別の対処法' },
   ]
@@ -103,20 +103,20 @@ export default function LandingPage() {
       {/* 3タイプ */}
       <section className="bg-gray-50 py-16 px-4">
         <div className="max-w-lg mx-auto">
-          <p className="text-xs text-gray-400 tracking-widest text-center mb-3">3 TYPES</p>
-          <h2 className="text-lg font-bold text-gray-800 text-center mb-10">3つの燃え尽きタイプ</h2>
+          <p className="text-xs text-gray-400 tracking-widest text-center mb-3">6 TYPES</p>
+          <h2 className="text-lg font-bold text-gray-800 text-center mb-10">6つの燃え尽きタイプ</h2>
           <div className="space-y-4">
             {types.map(key => {
               const t = TYPE_INFO[key]
               return (
                 <div key={key} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                   <div className="flex items-center gap-4 mb-3">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg font-bold" style={{ background: `linear-gradient(135deg, ${t.gradientFrom}, ${t.gradientTo})` }}>
-                      {t.nameEn.charAt(0)}
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-sm font-bold leading-tight text-center px-1" style={{ background: `linear-gradient(135deg, ${t.gradientFrom}, ${t.gradientTo})` }}>
+                      {t.name.charAt(0)}
                     </div>
                     <div>
-                      <h3 className={`text-base font-bold ${t.color}`}>{t.name}</h3>
-                      <p className="text-xs text-gray-400">{t.nameEn} Type</p>
+                      <h3 className={`text-sm font-bold ${t.color}`}>{t.name}</h3>
+                      <p className="text-[10px] text-gray-400">{t.pattern}</p>
                     </div>
                   </div>
                   <p className="text-sm text-gray-600 leading-relaxed">{t.summary}</p>
@@ -131,20 +131,10 @@ export default function LandingPage() {
 
       {/* 信頼性 */}
       <section className="py-12 px-4 bg-[#FFFDF7]">
-        <div className="max-w-lg mx-auto">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-emerald-100">
-            <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-medium text-emerald-700 mb-2">学術的根拠</p>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  本チェックは、Copenhagen Burnout Inventory（Kristensen et al., 2005）および
-                  Burnout Clinical Subtypes Questionnaire（Montero-Marín &amp; García-Campayo, 2010）
-                  に基づいて設計されています。
-                </p>
-              </div>
-            </div>
-          </div>
+        <div className="max-w-lg mx-auto text-center">
+          <Shield className="w-5 h-5 text-emerald-500 mx-auto mb-3" />
+          <p className="text-sm text-gray-700 font-medium mb-1">科学的に検証された質問項目を使用しています</p>
+          <p className="text-xs text-gray-400">※医学的診断ではありません。セルフチェックの目安としてご利用ください</p>
         </div>
       </section>
 
@@ -167,6 +157,11 @@ export default function LandingPage() {
             ※本サービスは医学的診断ではなく、セルフチェックの目安として提供しています。
             結果は個人の主観的回答に基づいており、医師の診断に代わるものではありません。
             つらい状況が続いている場合は、心療内科等の専門医療機関へご相談ください。
+          </p>
+          <p className="text-[10px] text-gray-400 leading-relaxed mb-4 max-w-sm mx-auto">
+            本チェックは、Copenhagen Burnout Inventory（Kristensen et al., 2005）および
+            Burnout Clinical Subtypes Questionnaire（Montero-Marín &amp; García-Campayo, 2010）
+            に基づいて設計されています。
           </p>
           <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
             <Link href="/privacy" className="hover:text-gray-600 transition-colors">プライバシーポリシー</Link>

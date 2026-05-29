@@ -20,9 +20,18 @@ export const QUICK_SCALE = [
   { value: 5, label: '常にある' },
 ]
 
-export type QuickType = 'frenetic' | 'underchallenged' | 'wornout' | 'balanced'
+import type { BurnoutType } from './scoring'
 
-export function calcQuickType(answers: Record<number, number>): { type: QuickType; score: number } {
+export type QuickBaseType = 'frenetic' | 'underchallenged' | 'wornout'
+
+// 簡易版の基本3タイプ → 6タイプのデフォルトマッピング
+const QUICK_TO_DETAILED: Record<QuickBaseType, BurnoutType> = {
+  frenetic: 'devotee',
+  underchallenged: 'seeker',
+  wornout: 'executor',
+}
+
+export function calcQuickType(answers: Record<number, number>): { type: BurnoutType; score: number } {
   const scores = { frenetic: 0, underchallenged: 0, wornout: 0 }
   const counts = { frenetic: 0, underchallenged: 0, wornout: 0 }
 
@@ -32,18 +41,19 @@ export function calcQuickType(answers: Record<number, number>): { type: QuickTyp
     counts[q.type]++
   }
 
-  const avgs = {
+  const avgs: Record<QuickBaseType, number> = {
     frenetic: scores.frenetic / (counts.frenetic || 1),
     underchallenged: scores.underchallenged / (counts.underchallenged || 1),
     wornout: scores.wornout / (counts.wornout || 1),
   }
 
-  const entries = Object.entries(avgs) as [QuickType, number][]
+  const entries = Object.entries(avgs) as [QuickBaseType, number][]
   entries.sort((a, b) => b[1] - a[1])
 
   const totalAvg = (scores.frenetic + scores.underchallenged + scores.wornout) / 5
   const overallScore = Math.round(((totalAvg - 1) / 4) * 100)
 
-  if (entries[0][1] < 2.5) return { type: 'balanced', score: overallScore }
-  return { type: entries[0][0], score: overallScore }
+  // 簡易版では基本3タイプから代表的な6タイプにマッピング
+  const baseType = entries[0][1] < 2.5 ? 'frenetic' : entries[0][0]
+  return { type: QUICK_TO_DETAILED[baseType], score: overallScore }
 }

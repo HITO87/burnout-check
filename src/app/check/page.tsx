@@ -3,14 +3,19 @@ import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { QUESTIONS, SCALE_LABELS } from '@/lib/questions'
 
+// Section AとBの境界（Q19の次=index 19がQ20=Section B開始）
+const SECTION_B_START = 19
+
 export default function CheckPage() {
   const router = useRouter()
   const [current, setCurrent] = useState(0)
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [submitting, setSubmitting] = useState(false)
+  const [showMidMessage, setShowMidMessage] = useState(false)
 
   const question = QUESTIONS[current]
   const total = QUESTIONS.length
+  const remaining = total - current - 1
   const progress = Math.round((current / total) * 100)
 
   const handleSelect = useCallback(async (value: number) => {
@@ -18,10 +23,15 @@ export default function CheckPage() {
     const newAnswers = { ...answers, [key]: value }
     setAnswers(newAnswers)
 
+    // Section A→B の境界で中間メッセージを表示
+    if (current === SECTION_B_START - 1) {
+      setShowMidMessage(true)
+      return
+    }
+
     if (current < total - 1) {
       setCurrent(current + 1)
     } else {
-      // 最後の質問 → 送信
       setSubmitting(true)
       try {
         const res = await fetch('/api/check', {
@@ -43,6 +53,34 @@ export default function CheckPage() {
     if (current > 0) setCurrent(current - 1)
   }
 
+  // 中間メッセージ画面
+  if (showMidMessage) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
+        <div className="text-center max-w-sm">
+          <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-6">
+            <span className="text-emerald-600 text-lg">✓</span>
+          </div>
+          <h2 className="text-lg font-bold text-gray-800 mb-3">ここまでお疲れさまでした</h2>
+          <p className="text-sm text-gray-500 leading-relaxed mb-2">半分終わりました！</p>
+          <p className="text-sm text-gray-500 leading-relaxed mb-8">
+            ここからは、あなたの燃え尽きタイプを判定するための質問です。あと12問です。
+          </p>
+          <button
+            onClick={() => {
+              setShowMidMessage(false)
+              setCurrent(SECTION_B_START)
+            }}
+            className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-full transition-colors shadow-lg shadow-emerald-200/50"
+          >
+            続ける
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ローディング画面
   if (submitting) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4">
@@ -53,7 +91,7 @@ export default function CheckPage() {
             {[
               '燃え尽き度スコアを算出中...',
               '3つの下位尺度を分析中...',
-              'バーンアウトタイプを判定中...',
+              '6タイプの判定中...',
             ].map((step, i) => (
               <div key={i} className="flex items-center gap-3 text-xs text-gray-400 animate-pulse" style={{ animationDelay: `${i * 0.5}s` }}>
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -68,7 +106,7 @@ export default function CheckPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* プログレスバー */}
+      {/* プログレスバー + 残り問題数 */}
       <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-100">
         <div className="h-1 bg-gray-100">
           <div
@@ -84,22 +122,21 @@ export default function CheckPage() {
           >
             ← 戻る
           </button>
-          <span className="text-xs text-gray-400">{current + 1} / {total}</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-400">あと{remaining}問</span>
+            <span className="text-[10px] text-gray-300">{current + 1}/{total}</span>
+          </div>
         </div>
       </div>
 
       {/* 質問 */}
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-lg">
-          {/* セクションラベル */}
           <p className="text-xs text-emerald-600 font-medium mb-3">{question.sectionLabel}</p>
-
-          {/* 質問文 */}
           <h2 className="text-lg font-bold text-gray-800 leading-relaxed mb-10">
             {question.text}
           </h2>
 
-          {/* 7段階スケール */}
           <div className="space-y-2">
             {SCALE_LABELS.map(({ value, label }) => {
               const selected = answers[`q${question.id}`] === value

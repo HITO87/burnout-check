@@ -45,7 +45,7 @@ export default async function ResultPage({ params }: Props) {
   const type = TYPE_INFO[primaryType]
   const severity = SEVERITY_INFO[result.severity as Severity]
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://burnout.hitone.app'
-  const shareText = `燃え尽き度${score}%、"${type.name}"だった...\nあなたは何タイプ？\n→ ${baseUrl}`
+  const shareText = `燃え尽きタイプ診断やったら【${type.name}】だった。「${type.hiddenStrength}の使いすぎ」って言われて刺さった…\nあなたは何タイプ？\n→ ${baseUrl}`
 
   return (
     <div className="min-h-screen bg-[#FFFDF7]">
@@ -79,7 +79,7 @@ export default async function ResultPage({ params }: Props) {
 
           {/* タイプ名 */}
           <h1 className="text-2xl font-bold text-white mb-2">{type.name}</h1>
-          <p className="text-white/70 text-xs">{type.nameEn} Type</p>
+          <p className="text-white/70 text-xs">隠された強み：{type.hiddenStrength}</p>
 
           {/* 重症度 */}
           <div className="mt-4 inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-xs font-medium px-4 py-2 rounded-full">
@@ -131,16 +131,17 @@ export default async function ResultPage({ params }: Props) {
           {/* タイプカードヘッダー */}
           <div className="p-5 border-b border-gray-50" style={{ background: `linear-gradient(135deg, ${type.gradientFrom}08, ${type.gradientTo}08)` }}>
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg" style={{ background: `linear-gradient(135deg, ${type.gradientFrom}, ${type.gradientTo})` }}>
-                {type.nameEn.charAt(0)}
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-sm font-bold shadow-lg leading-tight text-center px-1" style={{ background: `linear-gradient(135deg, ${type.gradientFrom}, ${type.gradientTo})` }}>
+                {type.name.charAt(0)}
               </div>
               <div>
                 <h2 className={`text-lg font-bold ${type.color}`}>{type.name}</h2>
-                <p className="text-xs text-gray-400">{type.nameEn} Type</p>
+                <p className="text-xs text-gray-400">隠された強み：{type.hiddenStrength}</p>
               </div>
             </div>
           </div>
           <div className="p-5">
+            <p className="text-sm text-gray-500 leading-relaxed mb-3 italic">{type.catchphrase}</p>
             <p className="text-sm text-gray-700 leading-relaxed">{type.body}</p>
           </div>
         </div>
