@@ -1,62 +1,102 @@
 'use client'
 import { useState } from 'react'
 import type { BurnoutType } from '@/lib/scoring'
-import { Lock, FileText, Calendar, BookOpen } from 'lucide-react'
+import { Lock, FileText, Calendar, BookOpen, ChevronRight } from 'lucide-react'
 
-const TEASER_CONTENT: Record<BurnoutType, { weeklyPlan: string[]; insight: string }> = {
+const TEASER_CONTENT: Record<BurnoutType, {
+  previewLines: string[]  // ぼかしなしで見せるプレビュー（3〜5行）
+  weeklyPlan: string[]
+  insight: string
+}> = {
   devotee: {
+    previewLines: [
+      'あなたの回答31問を分析した結果、「背負いすぎる献身家」タイプの傾向が見られます。',
+      'このタイプの方は、責任感と献身力が非常に強く、それが「自分がやらなきゃ」という思考パターンを生み出しています。',
+      'あなたの身体では今、HPA軸（ストレス応答システム）が過活動状態にあり、コルチゾールが高い状態が続いている可能性があります。',
+      'これは「止まれない」原因が意志の弱さではなく、身体のシステムにあることを意味しています。',
+    ],
     weeklyPlan: [
       '第1週：1日1つ「やらないこと」を決める練習',
       '第2週：「頼む」スキルを身につける3ステップ',
       '第3週：休むことへの罪悪感を手放すワーク',
       '第4週：新しいペースの定着と振り返り',
     ],
-    insight: '献身家の回復で最も重要なのは「止まる仕組み」を作ることです。あなたの献身力は素晴らしい強みですが...',
+    insight: '献身家の回復で最も重要なのは「止まる仕組み」を作ることです。意志の力では止まれません。',
   },
   perfectionist: {
+    previewLines: [
+      'あなたの回答31問を分析した結果、「求めすぎる職人気質」タイプの傾向が見られます。',
+      'このタイプの方は、妥協しない品質意識を持ち、それが「まだ足りない」という終わりのないループを生み出しています。',
+      'あなたの身体では今、コルチゾール（ストレスホルモン）が常に高い状態が続き、脳が「まだ終わっていない」と警報を出し続けています。',
+      '80点でも「まだ足りない」と感じるのは、性格ではなく身体の反応です。',
+    ],
     weeklyPlan: [
       '第1週：「80点でOK」の練習を1日1回',
       '第2週：完璧主義の裏にある恐れを特定する',
       '第3週：「十分に良い」の基準を再設定する',
       '第4週：新しい品質基準の定着と振り返り',
     ],
-    insight: '職人気質の回復では「完璧でなくても価値がある」を身体で理解することが鍵です。頭では分かっていても...',
+    insight: '職人気質の回復では「完璧でなくても価値がある」を身体で理解することが鍵です。',
   },
   empath: {
+    previewLines: [
+      'あなたの回答31問を分析した結果、「溜め込みすぎる共感者」タイプの傾向が見られます。',
+      'このタイプの方は、深い共感力と観察力を持ち、周囲の感情を受け取りすぎて内側から消耗しています。',
+      'あなたの身体では今、HPA軸の反応性が低下し、回復に必要なエネルギー自体が枯渇している可能性があります。',
+      '「自分さえ我慢すれば」という思考は、あなたの優しさの裏返しです。',
+    ],
     weeklyPlan: [
       '第1週：1日1回「自分の感情に名前をつける」',
       '第2週：感情の出口を作る（書く・話す・動く）',
       '第3週：「自分と他人の感情の境界線」を引く',
       '第4週：セルフケアの定着と振り返り',
     ],
-    insight: '共感者の回復は「感情を出すこと」から始まります。溜め込んだ感情はエネルギーを消耗し続けます...',
+    insight: '共感者の回復は「感情を出すこと」から始まります。溜め込んだ感情はエネルギーを消耗し続けます。',
   },
   executor: {
+    previewLines: [
+      'あなたの回答31問を分析した結果、「抱え込みすぎる実行者」タイプの傾向が見られます。',
+      'このタイプの方は、自立心と実行力が非常に強く、一人で全てを抱え込む傾向があります。',
+      'あなたの身体では今、努力に見合った報酬（ドーパミン）が得られない状態が続き、「頑張っても無駄だ」という学習が進んでいます。',
+      'これは怠けではなく、身体のストレス応答が消耗した結果です。',
+    ],
     weeklyPlan: [
       '第1週：1日1つ「できたこと」を書き出す',
       '第2週：「助けを求める」練習を週1回',
       '第3週：評価を外部に求めない自己承認の方法',
       '第4週：持続可能なペースの定着と振り返り',
     ],
-    insight: '実行者の回復は「一人で全部やらなくていい」を受け入れることから始まります。あなたの実行力は...',
+    insight: '実行者の回復は「一人で全部やらなくていい」を受け入れることから始まります。',
   },
   harmonizer: {
+    previewLines: [
+      'あなたの回答31問を分析した結果、「合わせすぎる調和者」タイプの傾向が見られます。',
+      'このタイプの方は、場を読む適応力が非常に高く、常に他者の感情を監視することで慢性的に疲弊しています。',
+      'あなたの身体では今、自律神経が慢性的に緊張状態にあり、完全にリラックスすることが難しくなっています。',
+      '「いい人でいなきゃ」という思考は、あなたの適応力の代償です。',
+    ],
     weeklyPlan: [
       '第1週：1日1回「自分はどう感じているか」を確認',
       '第2週：小さな「No」を練習する（週2回）',
       '第3週：「相手に合わせない時間」を意図的に作る',
       '第4週：自分軸の定着と振り返り',
     ],
-    insight: '調和者の回復の鍵は「自分の感情に気づくこと」です。他者に合わせ続けると、自分が何を感じているか...',
+    insight: '調和者の回復の鍵は「自分の感情に気づくこと」です。他者に合わせ続けると、自分が何を感じているか分からなくなります。',
   },
   seeker: {
+    previewLines: [
+      'あなたの回答31問を分析した結果、「考えすぎる探究者」タイプの傾向が見られます。',
+      'このタイプの方は、知的好奇心と成長欲求が非常に強く、それが満たされない環境で消耗しています。',
+      'あなたの身体では今、ドーパミン報酬系の反応が鈍化し、何をしても達成感を感じにくくなっています。',
+      '「このままでいいのか」という焦りは、あなたの成長欲求の表れです。',
+    ],
     weeklyPlan: [
       '第1週：1日1つ「小さな新しいこと」を試す',
       '第2週：自分の価値観を再発見するワーク',
       '第3週：「熟達体験」を意図的に作る方法',
       '第4週：新しい刺激の習慣化と振り返り',
     ],
-    insight: '探究者の回復の鍵は「小さな成功体験」の積み重ねです。大きな変化は必要ありません。毎日の中に...',
+    insight: '探究者の回復の鍵は「小さな成功体験」の積み重ねです。大きな変化は必要ありません。',
   },
 }
 
@@ -84,22 +124,31 @@ export default function PaidReportTeaser({ type, checkResultId }: { type: Burnou
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
       <div className="p-5 border-b border-gray-50">
         <p className="text-xs text-gray-400 tracking-wider mb-1">RECOVERY ROADMAP</p>
-        <h3 className="text-base font-bold text-gray-800">あなた専用の回復ロードマップ</h3>
+        <h3 className="text-base font-bold text-gray-800">あなた専用の回復レポート</h3>
+        <p className="text-xs text-gray-500 mt-1">あなたの回答31問すべてをAIが分析した、3,000文字以上のパーソナライズレポート</p>
       </div>
 
-      {/* 見えているプレビュー部分 */}
-      <div className="p-5 pb-0">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-            <Calendar className="w-4 h-4 text-emerald-600" />
+      {/* プレビュー：ぼかしなしで読める部分 */}
+      <div className="px-5 pt-5">
+        <div className="bg-gray-50 rounded-xl p-4 mb-4">
+          <p className="text-[10px] text-gray-400 tracking-wider mb-2">レポートの一部を先読み</p>
+          <div className="space-y-2">
+            {content.previewLines.map((line, i) => (
+              <p key={i} className="text-xs text-gray-700 leading-relaxed">{line}</p>
+            ))}
           </div>
-          <p className="text-sm font-medium text-gray-800">30日間の回復プラン</p>
         </div>
       </div>
 
-      {/* blur処理されたコンテンツ */}
+      {/* blur処理：30日プラン + 構造分析 */}
       <div className="relative px-5 pb-5">
         <div className="select-none" style={{ filter: 'blur(5px)' }}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+              <Calendar className="w-4 h-4 text-emerald-600" />
+            </div>
+            <p className="text-sm font-medium text-gray-800">30日間の回復プラン</p>
+          </div>
           <div className="space-y-3 mb-5">
             {content.weeklyPlan.map((week, i) => (
               <div key={i} className="flex items-start gap-3">
@@ -121,36 +170,33 @@ export default function PaidReportTeaser({ type, checkResultId }: { type: Burnou
         </div>
 
         {/* オーバーレイ + CTA */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white/0 via-white/80 to-white">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 text-center max-w-xs">
-            <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-3">
-              <Lock className="w-5 h-5 text-emerald-600" />
-            </div>
-            <p className="text-sm font-bold text-gray-800 mb-1">パーソナライズされた回復プラン</p>
-            <p className="text-xs text-gray-500 mb-4 leading-relaxed">
-              詳細な構造分析・30日間の具体的アクション・タイプ別おすすめリソースが含まれます
+        <div className="absolute inset-0 flex flex-col items-center justify-end pb-6 bg-gradient-to-b from-white/0 via-white/80 to-white">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 text-center max-w-xs w-full mx-4">
+            <p className="text-sm font-bold text-gray-800 mb-1">続きをレポートで読む</p>
+            <p className="text-xs text-gray-500 mb-3 leading-relaxed">
+              あなた専用の構造分析・30日間の回復プラン・おすすめ書籍が含まれます
             </p>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="flex-1 space-y-1 text-left">
-                {[
-                  { icon: FileText, text: '3,000字の詳細レポート' },
-                  { icon: Calendar, text: '30日間の週次プラン' },
-                  { icon: BookOpen, text: 'おすすめ書籍・ツール' },
-                ].map(({ icon: Icon, text }) => (
-                  <div key={text} className="flex items-center gap-2">
-                    <Icon className="w-3 h-3 text-emerald-500" />
-                    <span className="text-[10px] text-gray-500">{text}</span>
-                  </div>
-                ))}
-              </div>
+            <div className="space-y-1 mb-4 text-left">
+              {[
+                { icon: FileText, text: '3,000字以上の詳細レポート' },
+                { icon: Calendar, text: '30日間の週次アクションプラン' },
+                { icon: BookOpen, text: 'タイプ別おすすめ書籍3冊' },
+              ].map(({ icon: Icon, text }) => (
+                <div key={text} className="flex items-center gap-2">
+                  <Icon className="w-3 h-3 text-emerald-500" />
+                  <span className="text-[10px] text-gray-500">{text}</span>
+                </div>
+              ))}
             </div>
             <button
               onClick={handlePurchase}
               disabled={loading || !checkResultId}
-              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-full transition-colors shadow-lg shadow-emerald-200/50 disabled:opacity-50"
+              className="group w-full flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-full transition-colors shadow-lg shadow-emerald-200/50 disabled:opacity-50"
             >
               {loading ? '処理中...' : '回復レポートを受け取る（¥1,480）'}
+              {!loading && <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />}
             </button>
+            <p className="text-[10px] text-gray-400 mt-2">買い切り・即時発行・返品不可</p>
           </div>
         </div>
       </div>
