@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   const supabase = await createClient()
   const { data } = await supabase
     .from('recovery_codes')
-    .select('*, check_results(*)')
+    .select('*, check_results(*), paid_reports(report_content)')
     .eq('code', code)
     .maybeSingle()
 
