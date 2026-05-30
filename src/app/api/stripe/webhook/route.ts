@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
-import { getOpenAI, REPORT_SYSTEM_PROMPT } from '@/lib/openai'
+import { getAI, REPORT_SYSTEM_PROMPT } from '@/lib/openai'
 import { TYPE_INFO } from '@/lib/type-descriptions'
 import type { BurnoutType } from '@/lib/scoring'
 
@@ -26,11 +26,9 @@ export async function POST(req: NextRequest) {
 
     const supabase = await createClient()
 
-    // チェック結果を取得
     const { data: result } = await supabase.from('check_results').select('*').eq('id', checkResultId).maybeSingle()
     if (!result) return Response.json({ ok: true })
 
-    // paid_reportsにレコード作成
     const { data: report } = await supabase.from('paid_reports').insert({
       check_result_id: checkResultId,
       email,
@@ -40,20 +38,19 @@ export async function POST(req: NextRequest) {
 
     if (!report) return Response.json({ ok: true })
 
-    // GPT-4o-miniでレポート生成
+    // Claude Haikuでレポート生成
     try {
       const typeName = TYPE_INFO[result.primary_type as BurnoutType]?.name ?? result.primary_type
       const secondaryName = result.secondary_type ? (TYPE_INFO[result.secondary_type as BurnoutType]?.name ?? '') : 'なし'
 
-      const openai = getOpenAI()
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
+      const anthropic = getAI()
+      const response = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 4000,
-        messages: [
-          { role: 'system', content: REPORT_SYSTEM_PROMPT },
-          {
-            role: 'user',
-            content: `【入力データ】
+        system: REPORT_SYSTEM_PROMPT,
+        messages: [{
+          role: 'user',
+          content: `【入力データ】
 ・総合燃え尽き度スコア: ${result.total_score}/100
 ・個人的バーンアウト: ${result.personal_score}/100
 ・仕事関連バーンアウト: ${result.work_score}/100
@@ -66,11 +63,10 @@ export async function POST(req: NextRequest) {
 ・重症度: ${result.severity}
 
 上記データに基づいてパーソナライズされた回復レポートを生成してください。`,
-          },
-        ],
+        }],
       })
 
-      const reportContent = completion.choices[0]?.message?.content ?? ''
+      const reportContent = response.content[0]?.type === 'text' ? response.content[0].text : ''
 
       await supabase.from('paid_reports').update({
         report_content: reportContent,

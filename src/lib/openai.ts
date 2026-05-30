@@ -1,13 +1,13 @@
-import OpenAI from 'openai'
+import Anthropic from '@anthropic-ai/sdk'
 
-let _openai: OpenAI | null = null
+let _anthropic: Anthropic | null = null
 
-export function getOpenAI(): OpenAI {
-  if (!_openai) {
-    if (!process.env.OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not set')
-    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+export function getAI(): Anthropic {
+  if (!_anthropic) {
+    if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY not set')
+    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   }
-  return _openai
+  return _anthropic
 }
 
 export const REPORT_SYSTEM_PROMPT = `あなたは科学的根拠に基づいたバーンアウト回復の専門家です。
