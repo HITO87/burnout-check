@@ -4,7 +4,7 @@ import { TYPE_INFO } from '@/lib/type-descriptions'
 import type { BurnoutType } from '@/lib/scoring'
 import Link from 'next/link'
 import { BookOpen, Calendar, CheckCircle, ArrowRight, Heart, Shield, ExternalLink } from 'lucide-react'
-import { StressGauge, ScoreCompare, TypeCard, BodyStress, ReadingProgress, ReadingProgressScript } from '@/components/ReportVisuals'
+import { StressGauge, ScoreCompare, TypeCard, BodyStress, InsightCard, TYPE_INSIGHTS, ReadingProgress, ReadingProgressScript } from '@/components/ReportVisuals'
 import React from 'react'
 
 type Props = { params: Promise<{ id: string }> }
@@ -53,9 +53,8 @@ function formatContent(text: string, typeColor: string, visualInserts?: Record<n
       continue
     }
 
-    // --- 区切り線
+    // --- 区切り線（非表示 — 章分割で十分）
     if (line.trim() === '---') {
-      elements.push(<div key={i} className="my-6 border-t border-gray-100" />)
       i++
       continue
     }
@@ -123,11 +122,15 @@ function formatContent(text: string, typeColor: string, visualInserts?: Record<n
   return elements
 }
 
+// 段落カウンタ — 連続テキストが続いたらビジュアルブレイクを挿入
+let paragraphCount = 0
+
 // 章の中身をレンダリング
 function renderChapterContent(lines: string[], accentColor: string) {
   const elements: React.ReactNode[] = []
   let i = 0
   let listBuffer: string[] = []
+  paragraphCount = 0
 
   const flushList = () => {
     if (listBuffer.length === 0) return
@@ -146,6 +149,12 @@ function renderChapterContent(lines: string[], accentColor: string) {
 
   while (i < lines.length) {
     const line = lines[i]
+
+    // --- 区切り線（スキップ）
+    if (line.trim() === '---') { i++; continue }
+
+    // > 引用（免責文等）もテキストの中にある場合スキップ可能性を考慮
+    if (line.trim().startsWith('> ') && line.includes('セルフチェック')) { i++; continue }
 
     // ### サブ見出し
     if (line.startsWith('### ')) {
@@ -244,7 +253,19 @@ function renderChapterContent(lines: string[], accentColor: string) {
         </div>
       )
     } else {
+      paragraphCount++
       elements.push(<p key={i} className="text-sm text-gray-700 leading-[1.8] mb-3">{parseInline(line)}</p>)
+
+      // 4段落ごとにビジュアルブレイク（余白 + 区切りドット）
+      if (paragraphCount > 0 && paragraphCount % 4 === 0) {
+        elements.push(
+          <div key={`break-${i}`} className="flex justify-center gap-1.5 py-4">
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.3 }} />
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.5 }} />
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.3 }} />
+          </div>
+        )
+      }
     }
     i++
   }
@@ -341,19 +362,30 @@ export default async function ReportViewPage({ params }: Props) {
         </div>
 
         {/* レポート本文 + 章間ビジュアル */}
-        {formatContent(report.report_content, type.gradientFrom, {
-          // 第1章の後: 身体のストレス図 + スコア詳細
-          1: (
-            <div className="space-y-4">
-              <BodyStress type={primaryType} />
-              <ScoreCompare scores={[
-                { label: '個人的な消耗', score: personalScore, color: '#f97316' },
-                { label: '仕事による消耗', score: workScore, color: '#3b82f6' },
-                { label: '人間関係の消耗', score: interpersonalScore, color: '#8b5cf6' },
-              ]} />
-            </div>
-          ),
-        })}
+        {(() => {
+          const insights = TYPE_INSIGHTS[primaryType] ?? TYPE_INSIGHTS.devotee
+          return formatContent(report.report_content, type.gradientFrom, {
+            // 第1章の後: インサイトカード + 身体のストレス図 + スコア詳細
+            1: (
+              <div className="space-y-4">
+                {insights[0] && <InsightCard emoji={insights[0].emoji} text={insights[0].text} bgColor={insights[0].bgColor} />}
+                <BodyStress type={primaryType} />
+                <ScoreCompare scores={[
+                  { label: '個人的な消耗', score: personalScore, color: '#f97316' },
+                  { label: '仕事による消耗', score: workScore, color: '#3b82f6' },
+                  { label: '人間関係の消耗', score: interpersonalScore, color: '#8b5cf6' },
+                ]} />
+                {insights[1] && <InsightCard emoji={insights[1].emoji} text={insights[1].text} bgColor={insights[1].bgColor} />}
+              </div>
+            ),
+            // 第2章の後: 回復のインサイト
+            2: (
+              <div>
+                {insights[2] && <InsightCard emoji={insights[2].emoji} text={insights[2].text} bgColor={insights[2].bgColor} />}
+              </div>
+            ),
+          })
+        })()}
 
         {/* ===== ロードマップ セクション ===== */}
         <section className="mb-6">

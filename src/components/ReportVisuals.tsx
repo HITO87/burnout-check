@@ -156,6 +156,50 @@ export function DoAndDont({ doItems, dontItems }: { doItems: string[]; dontItems
   )
 }
 
+// インサイトカード（テキストの間に挟む視覚的ブレイク）
+export function InsightCard({ emoji, text, bgColor = 'bg-blue-50' }: { emoji: string; text: string; bgColor?: string }) {
+  return (
+    <div className={`${bgColor} rounded-2xl p-5 my-5 flex items-start gap-3`}>
+      <span className="text-2xl flex-shrink-0">{emoji}</span>
+      <p className="text-sm text-gray-700 leading-relaxed font-medium">{text}</p>
+    </div>
+  )
+}
+
+// タイプ別のインサイトイラスト集（サブ見出し間に挿入用）
+export const TYPE_INSIGHTS: Record<string, { emoji: string; text: string; bgColor: string }[]> = {
+  devotee: [
+    { emoji: '🏃‍♂️', text: '「自分がやらなきゃ」で走り続けた結果、ブレーキの踏み方を忘れてしまった状態です', bgColor: 'bg-orange-50' },
+    { emoji: '🔋', text: '電池が切れかけているのに、まだ充電より先に「あと少し」を選んでしまう', bgColor: 'bg-amber-50' },
+    { emoji: '🌿', text: '休むことは怠けではなく、長く走るための「充電」です', bgColor: 'bg-emerald-50' },
+  ],
+  perfectionist: [
+    { emoji: '🎯', text: '80点で十分なのに、100点じゃないと手を止められない。その基準が自分を追い詰めている', bgColor: 'bg-blue-50' },
+    { emoji: '⚖️', text: '「まだ足りない」の声は、あなたの品質意識の裏返し。強みが武器から重荷に変わっている', bgColor: 'bg-indigo-50' },
+    { emoji: '🌿', text: '完璧じゃなくても価値がある。それを身体で理解することが回復の鍵です', bgColor: 'bg-emerald-50' },
+  ],
+  empath: [
+    { emoji: '🫧', text: '人の感情を受け取りすぎて、自分の感情がどこにあるかわからなくなっている', bgColor: 'bg-teal-50' },
+    { emoji: '🧊', text: '「自分さえ我慢すれば」は、優しさの裏返し。でもその優しさが自分を溶かしている', bgColor: 'bg-cyan-50' },
+    { emoji: '🌿', text: '感情を出すことは弱さではなく、回復の第一歩です', bgColor: 'bg-emerald-50' },
+  ],
+  executor: [
+    { emoji: '🏋️', text: '一人で全部背負い続けた結果、「助けを求める」という選択肢が見えなくなっている', bgColor: 'bg-gray-100' },
+    { emoji: '📉', text: '頑張っても報われない経験が積み重なり、「どうせ」が口癖になりかけている', bgColor: 'bg-slate-50' },
+    { emoji: '🌿', text: '助けを求めることは弱さではなく、チームで成果を出すためのスキルです', bgColor: 'bg-emerald-50' },
+  ],
+  harmonizer: [
+    { emoji: '🎭', text: '場の空気を読みすぎて、「自分がどう感じているか」がわからなくなっている', bgColor: 'bg-purple-50' },
+    { emoji: '🪞', text: '「いい人」でいることに疲れた。でも「いい人じゃない自分」が怖い', bgColor: 'bg-violet-50' },
+    { emoji: '🌿', text: '自分の気持ちに気づくことが、本当の調和の始まりです', bgColor: 'bg-emerald-50' },
+  ],
+  seeker: [
+    { emoji: '🧭', text: '「このままでいいのか」という焦りは、脳が新しい刺激を求めているサイン', bgColor: 'bg-emerald-50' },
+    { emoji: '💤', text: '何もしたくないのは怠けではなく、脳の報酬系が省エネモードに入っている状態', bgColor: 'bg-green-50' },
+    { emoji: '🌿', text: '小さな「初めて」が脳を再起動させます。大きな変化は必要ありません', bgColor: 'bg-emerald-50' },
+  ],
+}
+
 // 読了進捗バー（スティッキー）
 export function ReadingProgress() {
   return (
