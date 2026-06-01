@@ -4,6 +4,7 @@ import { TYPE_INFO } from '@/lib/type-descriptions'
 import type { BurnoutType } from '@/lib/scoring'
 import Link from 'next/link'
 import { BookOpen, Calendar, CheckCircle, ArrowRight, Heart, Shield, ExternalLink } from 'lucide-react'
+import { StressGauge, ScoreCompare, TypeCard, BodyStress, ReadingProgress, ReadingProgressScript } from '@/components/ReportVisuals'
 import React from 'react'
 
 type Props = { params: Promise<{ id: string }> }
@@ -33,14 +34,15 @@ function parseInline(text: string): React.ReactNode[] {
 }
 
 // マークダウンを構造化されたReactコンポーネントに変換
-function formatContent(text: string, typeColor: string) {
+// visualInserts: 章番号 → その章の後に挿入するReactNode
+function formatContent(text: string, typeColor: string, visualInserts?: Record<number, React.ReactNode>) {
   const lines = text.split('\n')
   const elements: React.ReactNode[] = []
   let i = 0
   let chapterIndex = 0
 
   const chapterIcons = [Shield, Heart, Calendar, BookOpen, ArrowRight]
-  const chapterColors = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6']
+  const chapterColors = ['#6366f1', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6']
 
   while (i < lines.length) {
     const line = lines[i]
@@ -73,8 +75,11 @@ function formatContent(text: string, typeColor: string) {
         i++
       }
 
+      // 第3章（手紙）は特別なスタイル
+      const isLetter = chapterIndex === 3
+
       elements.push(
-        <section key={`ch-${chapterIndex}`} className="mb-6">
+        <section key={`ch-${chapterIndex}`} className="mb-8">
           {/* 章ヘッダー */}
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${color}12` }}>
@@ -86,11 +91,23 @@ function formatContent(text: string, typeColor: string) {
             </div>
           </div>
           {/* 章の内容 */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
+          <div className={isLetter
+            ? 'bg-gradient-to-b from-amber-50 to-orange-50 rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8'
+            : 'bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6'
+          }>
             {renderChapterContent(chapterLines, color)}
           </div>
         </section>
       )
+
+      // 章の後にビジュアル要素を挿入
+      if (visualInserts?.[chapterIndex]) {
+        elements.push(
+          <div key={`visual-${chapterIndex}`} className="mb-8">
+            {visualInserts[chapterIndex]}
+          </div>
+        )
+      }
       continue
     }
 
@@ -285,6 +302,10 @@ export default async function ReportViewPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-[#FFFDF7]">
+      {/* 読了進捗バー */}
+      <ReadingProgress />
+      <ReadingProgressScript />
+
       {/* ヘッダー */}
       <div className="py-6 px-4 border-b border-gray-100 bg-white">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
@@ -300,52 +321,39 @@ export default async function ReportViewPage({ params }: Props) {
 
       <div className="max-w-2xl mx-auto px-4 py-8">
 
-        {/* スコアサマリーカード */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 mb-6">
-          <p className="text-[10px] text-gray-400 tracking-wider mb-3">SCORE SUMMARY</p>
-
-          {/* 総合スコア */}
-          <div className="flex items-center gap-4 mb-5">
-            <div className="relative w-16 h-16">
-              <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none" stroke="#f3f4f6" strokeWidth="3" />
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none" stroke={type.gradientFrom} strokeWidth="3"
-                  strokeDasharray={`${totalScore}, 100`} strokeLinecap="round" />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-lg font-bold text-gray-800">{totalScore}</span>
-              </div>
-            </div>
-            <div>
-              <p className="text-sm font-bold text-gray-800">総合スコア {totalScore}/100</p>
-              <p className="text-xs text-gray-500 mt-0.5">{type.catchphrase.split('、')[0]}</p>
-            </div>
+        {/* ===== 視覚セクション1: ストレスゲージ + タイプカード ===== */}
+        <div className="mb-8">
+          {/* ゲージ3つ */}
+          <div className="flex justify-center gap-4 mb-6">
+            <StressGauge score={personalScore} label="個人的な消耗" />
+            <StressGauge score={workScore} label="仕事の消耗" />
+            <StressGauge score={interpersonalScore} label="対人の消耗" />
           </div>
 
-          {/* 3つの下位スコア */}
-          <div className="space-y-3">
-            {[
-              { label: '個人的バーンアウト', score: personalScore, color: '#f97316' },
-              { label: '仕事関連バーンアウト', score: workScore, color: '#3b82f6' },
-              { label: '対人関連バーンアウト', score: interpersonalScore, color: '#8b5cf6' },
-            ].map((item) => (
-              <div key={item.label}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-gray-600">{item.label}</span>
-                  <span className="text-xs font-bold text-gray-800">{item.score}/100</span>
-                </div>
-                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full rounded-full transition-all" style={{ width: `${item.score}%`, backgroundColor: item.color }} />
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* タイプカード */}
+          <TypeCard
+            typeName={type.name}
+            hiddenStrength={type.hiddenStrength}
+            pattern={type.pattern}
+            gradientFrom={type.gradientFrom}
+            gradientTo={type.gradientTo}
+          />
         </div>
 
-        {/* レポート本文 */}
-        {formatContent(report.report_content, type.gradientFrom)}
+        {/* レポート本文 + 章間ビジュアル */}
+        {formatContent(report.report_content, type.gradientFrom, {
+          // 第1章の後: 身体のストレス図 + スコア詳細
+          1: (
+            <div className="space-y-4">
+              <BodyStress type={primaryType} />
+              <ScoreCompare scores={[
+                { label: '個人的な消耗', score: personalScore, color: '#f97316' },
+                { label: '仕事による消耗', score: workScore, color: '#3b82f6' },
+                { label: '人間関係の消耗', score: interpersonalScore, color: '#8b5cf6' },
+              ]} />
+            </div>
+          ),
+        })}
 
         {/* ===== ロードマップ セクション ===== */}
         <section className="mb-6">
