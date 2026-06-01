@@ -115,10 +115,10 @@ function renderChapterContent(lines: string[], accentColor: string) {
   const flushList = () => {
     if (listBuffer.length === 0) return
     elements.push(
-      <div key={`list-${i}`} className="space-y-2 my-3">
+      <div key={`list-${i}`} className="space-y-2.5 my-4 pl-1">
         {listBuffer.map((item, j) => (
-          <div key={j} className="flex items-start gap-2.5">
-            <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: accentColor }} />
+          <div key={j} className="flex items-start gap-3 bg-gray-50/50 rounded-lg px-3 py-2">
+            <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: accentColor }} />
             <p className="text-sm text-gray-700 leading-relaxed">{parseInline(item)}</p>
           </div>
         ))}
@@ -135,10 +135,10 @@ function renderChapterContent(lines: string[], accentColor: string) {
       flushList()
       const subtitle = line.replace('### ', '')
       elements.push(
-        <h3 key={i} className="text-sm font-bold text-gray-800 mt-5 mb-2 flex items-center gap-2">
-          <div className="w-1 h-4 rounded-full" style={{ backgroundColor: accentColor }} />
-          {subtitle}
-        </h3>
+        <div key={i} className="mt-8 mb-3 flex items-center gap-3">
+          <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: accentColor }} />
+          <h3 className="text-base font-bold text-gray-800">{subtitle}</h3>
+        </div>
       )
       i++
       continue
@@ -195,14 +195,21 @@ function renderChapterContent(lines: string[], accentColor: string) {
     // 空行
     if (line.trim() === '') {
       flushList()
-      elements.push(<div key={i} className="h-2" />)
+      elements.push(<div key={i} className="h-4" />)
       i++
       continue
     }
 
-    // 通常のテキスト — 「重要なメッセージ」を含む行はハイライト
+    // 通常のテキスト — 特定のキーワードを含む行はハイライトボックスで強調
     flushList()
-    if (line.includes('これは性格の問題ではなく') || line.includes('性格ではなく') || line.includes('身体の反応です')) {
+    const highlightKeywords = [
+      'これは性格の問題ではなく', '性格ではなく', '身体の反応です', '身体の問題です',
+      '意志の力では', '仕組みで止まる', '方法は、変えられます',
+      '一人で全部やらなくていい', 'もう一人で背負わなくていい',
+    ]
+    const isHighlight = highlightKeywords.some(kw => line.includes(kw))
+
+    if (isHighlight) {
       elements.push(
         <div key={i} className="my-4 p-4 rounded-xl bg-amber-50 border border-amber-100">
           <div className="flex items-start gap-2">
@@ -211,8 +218,16 @@ function renderChapterContent(lines: string[], accentColor: string) {
           </div>
         </div>
       )
+    } else if (line.startsWith('**') && line.endsWith('**')) {
+      // **太字だけの行** → カード風の強調ブロック
+      const text = line.replace(/^\*\*|\*\*$/g, '')
+      elements.push(
+        <div key={i} className="my-3 p-3 rounded-lg bg-gray-50 border-l-3" style={{ borderLeftColor: accentColor }}>
+          <p className="text-sm font-bold text-gray-800">{text}</p>
+        </div>
+      )
     } else {
-      elements.push(<p key={i} className="text-sm text-gray-700 leading-relaxed mb-2">{parseInline(line)}</p>)
+      elements.push(<p key={i} className="text-sm text-gray-700 leading-[1.8] mb-3">{parseInline(line)}</p>)
     }
     i++
   }
