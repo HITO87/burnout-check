@@ -4,7 +4,7 @@ import { TYPE_INFO } from '@/lib/type-descriptions'
 import type { BurnoutType } from '@/lib/scoring'
 import Link from 'next/link'
 import { BookOpen, Calendar, CheckCircle, ArrowRight, Heart, Shield, ExternalLink } from 'lucide-react'
-import { StressGauge, ScoreCompare, TypeCard, BodyStress, InsightCard, TYPE_INSIGHTS, ReadingProgress, ReadingProgressScript } from '@/components/ReportVisuals'
+import { StressGauge, ScoreCompare, TypeCard, BodyStress, ReadingProgress, ReadingProgressScript } from '@/components/ReportVisuals'
 import React from 'react'
 
 type Props = { params: Promise<{ id: string }> }
@@ -117,7 +117,7 @@ function formatContent(text: string, typeColor: string, visualInserts?: Record<n
 
     // それ以外の行（章外のテキスト）
     if (line.trim()) {
-      elements.push(<p key={i} className="text-sm text-gray-700 leading-relaxed mb-2">{parseInline(line)}</p>)
+      elements.push(<p key={i} className="text-base text-gray-700 leading-relaxed mb-3">{parseInline(line)}</p>)
     } else {
       elements.push(<div key={i} className="h-2" />)
     }
@@ -144,7 +144,7 @@ function renderChapterContent(lines: string[], accentColor: string) {
         {listBuffer.map((item, j) => (
           <div key={j} className="flex items-start gap-3 bg-gray-50/50 rounded-lg px-3 py-2">
             <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: accentColor }} />
-            <p className="text-sm text-gray-700 leading-relaxed">{parseInline(item)}</p>
+            <p className="text-base text-gray-700 leading-relaxed">{parseInline(item)}</p>
           </div>
         ))}
       </div>
@@ -203,7 +203,7 @@ function renderChapterContent(lines: string[], accentColor: string) {
           <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: `${accentColor}15` }}>
             <span className="text-[10px] font-bold" style={{ color: accentColor }}>{num}</span>
           </div>
-          <p className="text-sm text-gray-700 leading-relaxed">{parseInline(content)}</p>
+          <p className="text-base text-gray-700 leading-relaxed">{parseInline(content)}</p>
         </div>
       )
       i++
@@ -216,7 +216,7 @@ function renderChapterContent(lines: string[], accentColor: string) {
       const quote = line.replace(/^>\s*/, '')
       elements.push(
         <div key={i} className="my-4 p-4 rounded-xl border-l-3" style={{ backgroundColor: `${accentColor}08`, borderLeftColor: accentColor }}>
-          <p className="text-sm text-gray-700 leading-relaxed italic">{parseInline(quote)}</p>
+          <p className="text-base text-gray-700 leading-relaxed italic">{parseInline(quote)}</p>
         </div>
       )
       i++
@@ -245,7 +245,7 @@ function renderChapterContent(lines: string[], accentColor: string) {
         <div key={i} className="my-4 p-4 rounded-xl bg-amber-50 border border-amber-100">
           <div className="flex items-start gap-2">
             <Heart className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-gray-700 leading-relaxed font-medium">{parseInline(line)}</p>
+            <p className="text-base text-gray-700 leading-relaxed font-medium">{parseInline(line)}</p>
           </div>
         </div>
       )
@@ -259,18 +259,7 @@ function renderChapterContent(lines: string[], accentColor: string) {
       )
     } else {
       paragraphCount++
-      elements.push(<p key={i} className="text-sm text-gray-700 leading-[1.8] mb-3">{parseInline(line)}</p>)
-
-      // 4段落ごとにビジュアルブレイク（余白 + 区切りドット）
-      if (paragraphCount > 0 && paragraphCount % 4 === 0) {
-        elements.push(
-          <div key={`break-${i}`} className="flex justify-center gap-1.5 py-4">
-            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.3 }} />
-            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.5 }} />
-            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.3 }} />
-          </div>
-        )
-      }
+      elements.push(<p key={i} className="text-base text-gray-700 leading-[1.9] mb-4">{parseInline(line)}</p>)
     }
     i++
   }
@@ -367,30 +356,19 @@ export default async function ReportViewPage({ params }: Props) {
         </div>
 
         {/* レポート本文 + 章間ビジュアル */}
-        {(() => {
-          const insights = TYPE_INSIGHTS[primaryType] ?? TYPE_INSIGHTS.devotee
-          return formatContent(report.report_content, type.gradientFrom, {
-            // 第1章の後: インサイトカード + 身体のストレス図 + スコア詳細
-            1: (
-              <div className="space-y-4">
-                {insights[0] && <InsightCard emoji={insights[0].emoji} text={insights[0].text} bgColor={insights[0].bgColor} />}
-                <BodyStress type={primaryType} />
-                <ScoreCompare scores={[
-                  { label: '個人的な消耗', score: personalScore, color: '#f97316' },
-                  { label: '仕事による消耗', score: workScore, color: '#3b82f6' },
-                  { label: '人間関係の消耗', score: interpersonalScore, color: '#8b5cf6' },
-                ]} />
-                {insights[1] && <InsightCard emoji={insights[1].emoji} text={insights[1].text} bgColor={insights[1].bgColor} />}
-              </div>
-            ),
-            // 第2章の後: 回復のインサイト
-            2: (
-              <div>
-                {insights[2] && <InsightCard emoji={insights[2].emoji} text={insights[2].text} bgColor={insights[2].bgColor} />}
-              </div>
-            ),
-          })
-        })()}
+        {formatContent(report.report_content, type.gradientFrom, {
+          // 第1章の後: 身体のストレス図 + スコア詳細
+          1: (
+            <div className="space-y-4">
+              <BodyStress type={primaryType} />
+              <ScoreCompare scores={[
+                { label: '個人的な消耗', score: personalScore, color: '#f97316' },
+                { label: '仕事による消耗', score: workScore, color: '#3b82f6' },
+                { label: '人間関係の消耗', score: interpersonalScore, color: '#8b5cf6' },
+              ]} />
+            </div>
+          ),
+        })}
 
         {/* ===== ロードマップ セクション ===== */}
         <section className="mb-6">
