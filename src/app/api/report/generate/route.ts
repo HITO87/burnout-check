@@ -4,7 +4,7 @@ import { getAI, REPORT_SYSTEM_PROMPT } from '@/lib/openai'
 import { TYPE_INFO } from '@/lib/type-descriptions'
 import type { BurnoutType } from '@/lib/scoring'
 
-export const maxDuration = 60
+export const maxDuration = 120
 
 // POST: レポート生成（無料）
 export async function POST(req: NextRequest) {
