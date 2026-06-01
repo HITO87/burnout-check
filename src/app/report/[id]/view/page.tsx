@@ -5,30 +5,38 @@ import type { BurnoutType } from '@/lib/scoring'
 import Link from 'next/link'
 import { BookOpen, Calendar, CheckCircle, ArrowRight, Heart, Shield, ExternalLink } from 'lucide-react'
 import { StressGauge, ScoreCompare, TypeCard, BodyStress, ReadingProgress, ReadingProgressScript } from '@/components/ReportVisuals'
+import { getSectionIllustration } from '@/components/SectionIllustrations'
 import React from 'react'
 
 type Props = { params: Promise<{ id: string }> }
 
-// インラインマークダウン（太字）をReactノードに変換。*単体* は除去
+// インラインマークダウンをReactノードに変換。アスタリスクを完全除去
 function parseInline(text: string): React.ReactNode[] {
-  // まず *テキスト* （シングルアスタリスク）を除去してプレーンテキストにする
-  let cleaned = text.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '$1')
-  // 行頭・行末の孤立した * も除去
-  cleaned = cleaned.replace(/^\*\s?|\s?\*$/g, '')
+  // 1. **太字** を一旦プレースホルダーに置換
+  let cleaned = text
+  const bolds: string[] = []
+  cleaned = cleaned.replace(/\*\*(.+?)\*\*/g, (_, content) => {
+    bolds.push(content)
+    return `__BOLD_${bolds.length - 1}__`
+  })
 
+  // 2. 残っている * を全て除去
+  cleaned = cleaned.replace(/\*/g, '')
+
+  // 3. プレースホルダーを太字Reactノードに戻す
   const parts: React.ReactNode[] = []
   let remaining = cleaned
   let key = 0
 
   while (remaining.length > 0) {
-    // **太字**
-    const boldMatch = remaining.match(/\*\*(.+?)\*\*/)
-    if (boldMatch && boldMatch.index !== undefined) {
-      if (boldMatch.index > 0) {
-        parts.push(remaining.slice(0, boldMatch.index))
+    const match = remaining.match(/__BOLD_(\d+)__/)
+    if (match && match.index !== undefined) {
+      if (match.index > 0) {
+        parts.push(remaining.slice(0, match.index))
       }
-      parts.push(<strong key={key++} className="font-semibold text-gray-800">{boldMatch[1]}</strong>)
-      remaining = remaining.slice(boldMatch.index + boldMatch[0].length)
+      const boldIndex = parseInt(match[1])
+      parts.push(<strong key={key++} className="font-semibold text-gray-800">{bolds[boldIndex]}</strong>)
+      remaining = remaining.slice(match.index + match[0].length)
       continue
     }
     parts.push(remaining)
@@ -40,7 +48,7 @@ function parseInline(text: string): React.ReactNode[] {
 
 // マークダウンを構造化されたReactコンポーネントに変換
 // visualInserts: 章番号 → その章の後に挿入するReactNode
-function formatContent(text: string, typeColor: string, visualInserts?: Record<number, React.ReactNode>) {
+function formatContent(text: string, typeColor: string, visualInserts?: Record<number, React.ReactNode>, burnoutType?: string) {
   const lines = text.split('\n')
   const elements: React.ReactNode[] = []
   let i = 0
@@ -99,7 +107,7 @@ function formatContent(text: string, typeColor: string, visualInserts?: Record<n
             ? 'bg-gradient-to-b from-amber-50 to-orange-50 rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8'
             : 'bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6'
           }>
-            {renderChapterContent(chapterLines, color)}
+            {renderChapterContent(chapterLines, color, burnoutType)}
           </div>
         </section>
       )
@@ -131,10 +139,11 @@ function formatContent(text: string, typeColor: string, visualInserts?: Record<n
 let paragraphCount = 0
 
 // 章の中身をレンダリング
-function renderChapterContent(lines: string[], accentColor: string) {
+function renderChapterContent(lines: string[], accentColor: string, burnoutType?: string) {
   const elements: React.ReactNode[] = []
   let i = 0
   let listBuffer: string[] = []
+  let subHeadingCount = 0
   paragraphCount = 0
 
   const flushList = () => {
@@ -161,16 +170,28 @@ function renderChapterContent(lines: string[], accentColor: string) {
     // > 引用（免責文等）もテキストの中にある場合スキップ可能性を考慮
     if (line.trim().startsWith('> ') && line.includes('セルフチェック')) { i++; continue }
 
-    // ### サブ見出し
+    // ### サブ見出し + タイプ別イラスト
     if (line.startsWith('### ')) {
       flushList()
       const subtitle = line.replace('### ', '')
+
+      // サブ見出し
       elements.push(
         <div key={i} className="mt-8 mb-3 flex items-center gap-3">
           <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: accentColor }} />
           <h3 className="text-base font-bold text-gray-800">{subtitle}</h3>
         </div>
       )
+
+      // タイプ別イラストカードを挿入
+      if (burnoutType) {
+        const illustration = getSectionIllustration(burnoutType as import('@/lib/scoring').BurnoutType, subHeadingCount)
+        if (illustration) {
+          elements.push(<div key={`illust-${i}`} className="mb-4">{illustration}</div>)
+        }
+      }
+      subHeadingCount++
+
       i++
       continue
     }
@@ -357,7 +378,6 @@ export default async function ReportViewPage({ params }: Props) {
 
         {/* レポート本文 + 章間ビジュアル */}
         {formatContent(report.report_content, type.gradientFrom, {
-          // 第1章の後: 身体のストレス図 + スコア詳細
           1: (
             <div className="space-y-4">
               <BodyStress type={primaryType} />
@@ -368,7 +388,7 @@ export default async function ReportViewPage({ params }: Props) {
               ]} />
             </div>
           ),
-        })}
+        }, primaryType)}
 
         {/* ===== ロードマップ セクション ===== */}
         <section className="mb-6">
