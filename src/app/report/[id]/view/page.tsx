@@ -175,21 +175,18 @@ function renderChapterContent(lines: string[], accentColor: string, burnoutType?
       flushList()
       const subtitle = line.replace('### ', '')
 
-      // サブ見出し
+      // サブ見出し — アイコン付きカード風
+      const sectionEmojis = ['📊', '🔍', '🧠', '💡', '⚡', '🛡', '🌱', '✨']
+      const emoji = sectionEmojis[subHeadingCount % sectionEmojis.length]
       elements.push(
-        <div key={i} className="mt-8 mb-3 flex items-center gap-3">
-          <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: accentColor }} />
-          <h3 className="text-base font-bold text-gray-800">{subtitle}</h3>
+        <div key={i} className="mt-10 mb-4 rounded-xl p-4" style={{ backgroundColor: `${accentColor}08` }}>
+          <div className="flex items-center gap-3">
+            <span className="text-xl">{emoji}</span>
+            <h3 className="text-base font-bold text-gray-800">{subtitle}</h3>
+          </div>
         </div>
       )
 
-      // タイプ別イラストカードを挿入
-      if (burnoutType) {
-        const illustration = getSectionIllustration(burnoutType as import('@/lib/scoring').BurnoutType, subHeadingCount)
-        if (illustration) {
-          elements.push(<div key={`illust-${i}`} className="mb-4">{illustration}</div>)
-        }
-      }
       subHeadingCount++
 
       i++
