@@ -79,13 +79,18 @@ function formatContent(text: string, typeColor: string, visualInserts?: Record<n
       const color = chapterColors[chapterIndex % chapterColors.length]
       chapterIndex++
 
-      // 章の内容を次の ## まで収集
-      const chapterLines: string[] = []
+      // 章の内容を次の ## まで収集（先頭の空行を除去）
+      const rawChapterLines: string[] = []
       i++
       while (i < lines.length && !lines[i].startsWith('## ')) {
-        chapterLines.push(lines[i])
+        rawChapterLines.push(lines[i])
         i++
       }
+      // 先頭の空行を除去
+      while (rawChapterLines.length > 0 && rawChapterLines[0].trim() === '') {
+        rawChapterLines.shift()
+      }
+      const chapterLines = rawChapterLines
 
       // 第3章（手紙）は特別なスタイル
       const isLetter = chapterIndex === 3
