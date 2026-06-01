@@ -9,10 +9,15 @@ import React from 'react'
 
 type Props = { params: Promise<{ id: string }> }
 
-// インラインマークダウン（太字・リンク）をReactノードに変換
+// インラインマークダウン（太字）をReactノードに変換。*単体* は除去
 function parseInline(text: string): React.ReactNode[] {
+  // まず *テキスト* （シングルアスタリスク）を除去してプレーンテキストにする
+  let cleaned = text.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '$1')
+  // 行頭・行末の孤立した * も除去
+  cleaned = cleaned.replace(/^\*\s?|\s?\*$/g, '')
+
   const parts: React.ReactNode[] = []
-  let remaining = text
+  let remaining = cleaned
   let key = 0
 
   while (remaining.length > 0) {
