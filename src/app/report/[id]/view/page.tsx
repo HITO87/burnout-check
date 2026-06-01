@@ -354,8 +354,14 @@ export default async function ReportViewPage({ params }: Props) {
             <p className="text-xs text-gray-400 tracking-wider">YOUR RECOVERY REPORT</p>
             <h1 className="text-base font-bold text-gray-800">あなた専用の回復レポート</h1>
           </div>
-          <div className="px-3 py-1.5 rounded-full text-xs font-medium" style={{ backgroundColor: `${type.gradientFrom}15`, color: type.gradientFrom }}>
-            {type.name}
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <p className="text-lg font-bold text-gray-800">{totalScore}<span className="text-xs text-gray-400 font-normal">/100</span></p>
+              <p className="text-[10px] text-gray-400">総合スコア</p>
+            </div>
+            <div className="px-3 py-1.5 rounded-full text-xs font-medium" style={{ backgroundColor: `${type.gradientFrom}15`, color: type.gradientFrom }}>
+              {type.name}
+            </div>
           </div>
         </div>
       </div>
