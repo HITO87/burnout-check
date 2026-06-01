@@ -141,7 +141,9 @@ let paragraphCount = 0
 // 章の中身をレンダリング
 function renderChapterContent(lines: string[], accentColor: string, burnoutType?: string) {
   const elements: React.ReactNode[] = []
+  // 先頭の空行をスキップ
   let i = 0
+  while (i < lines.length && lines[i].trim() === '') i++
   let listBuffer: string[] = []
   let subHeadingCount = 0
   paragraphCount = 0
