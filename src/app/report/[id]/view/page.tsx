@@ -175,14 +175,14 @@ function renderChapterContent(lines: string[], accentColor: string, burnoutType?
       flushList()
       const subtitle = line.replace('### ', '')
 
-      // サブ見出し — アイコン付きカード風
+      // サブ見出し — 左ボーダー + 背景色で強調
       const sectionEmojis = ['📊', '🔍', '🧠', '💡', '⚡', '🛡', '🌱', '✨']
       const emoji = sectionEmojis[subHeadingCount % sectionEmojis.length]
       elements.push(
-        <div key={i} className="mt-10 mb-4 rounded-xl p-4" style={{ backgroundColor: `${accentColor}08` }}>
+        <div key={i} className="mt-10 mb-4 rounded-xl p-4 border-l-4" style={{ backgroundColor: `${accentColor}10`, borderLeftColor: accentColor }}>
           <div className="flex items-center gap-3">
             <span className="text-xl">{emoji}</span>
-            <h3 className="text-base font-bold text-gray-800">{subtitle}</h3>
+            <h3 className="text-lg font-bold" style={{ color: accentColor }}>{subtitle}</h3>
           </div>
         </div>
       )
