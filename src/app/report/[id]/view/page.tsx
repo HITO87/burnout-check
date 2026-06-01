@@ -109,8 +109,8 @@ function formatContent(text: string, typeColor: string, visualInserts?: Record<n
           </div>
           {/* 章の内容 */}
           <div className={isLetter
-            ? 'bg-gradient-to-b from-amber-50 to-orange-50 rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8'
-            : 'bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6'
+            ? 'bg-gradient-to-b from-amber-50 to-orange-50 rounded-2xl shadow-sm border border-amber-100 px-5 pb-5 pt-1 sm:px-6 sm:pb-6 sm:pt-1'
+            : 'bg-white rounded-2xl shadow-sm border border-gray-100 px-5 pb-5 pt-1 sm:px-6 sm:pb-6 sm:pt-1'
           }>
             {renderChapterContent(chapterLines, color, burnoutType)}
           </div>
@@ -185,8 +185,9 @@ function renderChapterContent(lines: string[], accentColor: string, burnoutType?
       // サブ見出し — 左ボーダー + 背景色で強調
       const sectionEmojis = ['📊', '🔍', '🧠', '💡', '⚡', '🛡', '🌱', '✨']
       const emoji = sectionEmojis[subHeadingCount % sectionEmojis.length]
+      const isFirst = subHeadingCount === 0
       elements.push(
-        <div key={i} className="mt-10 mb-4 rounded-xl p-4 border-l-4" style={{ backgroundColor: `${accentColor}10`, borderLeftColor: accentColor }}>
+        <div key={i} className={`${isFirst ? 'mt-0' : 'mt-8'} mb-4 rounded-xl p-4 border-l-4`} style={{ backgroundColor: `${accentColor}10`, borderLeftColor: accentColor }}>
           <div className="flex items-center gap-3">
             <span className="text-xl">{emoji}</span>
             <h3 className="text-lg font-bold" style={{ color: accentColor }}>{subtitle}</h3>
