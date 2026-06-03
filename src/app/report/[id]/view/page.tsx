@@ -35,7 +35,7 @@ function parseInline(text: string): React.ReactNode[] {
         parts.push(remaining.slice(0, match.index))
       }
       const boldIndex = parseInt(match[1])
-      parts.push(<strong key={key++} className="font-semibold text-gray-800">{bolds[boldIndex]}</strong>)
+      parts.push(<strong key={key++} className="font-bold text-gray-900">{bolds[boldIndex]}</strong>)
       remaining = remaining.slice(match.index + match[0].length)
       continue
     }
