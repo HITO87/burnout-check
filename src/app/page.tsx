@@ -22,7 +22,7 @@ export default function LandingPage() {
   const types = ['devotee', 'perfectionist', 'empath', 'executor', 'harmonizer', 'seeker'] as const
 
   const features = [
-    { icon: BarChart3, label: '燃え尽き度スコア', desc: '0〜100で数値化' },
+    { icon: BarChart3, label: 'コンディションスコア', desc: '0〜100で数値化' },
     { icon: Search, label: 'タイプ判定', desc: '6タイプから特定' },
     { icon: Brain, label: '身体のメカニズム', desc: '何が起きているか図解' },
     { icon: Map, label: '回復のヒント', desc: 'タイプ別の対処法' },
@@ -38,10 +38,10 @@ export default function LandingPage() {
             学術研究に基づいたセルフチェック
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-5 tracking-tight">
-            あなたの燃え尽き、<br />科学で読み解く。
+            あなたの「隠れた強み」、<br />科学で読み解く。
           </h1>
           <p className="text-sm text-gray-500 leading-relaxed mb-10 max-w-sm mx-auto">
-            8分のセルフチェックで、あなたの燃え尽きタイプと回復の道筋がわかります。
+            8分のセルフチェックで、あなたの頑張り方のタイプと、強みの活かし方がわかります。
           </p>
           <Link
             href="/check"
@@ -104,7 +104,7 @@ export default function LandingPage() {
       <section className="bg-gray-50 py-16 px-4">
         <div className="max-w-lg mx-auto">
           <p className="text-xs text-gray-400 tracking-widest text-center mb-3">6 TYPES</p>
-          <h2 className="text-lg font-bold text-gray-800 text-center mb-10">6つの燃え尽きタイプ</h2>
+          <h2 className="text-lg font-bold text-gray-800 text-center mb-10">6つの「隠れた強み」タイプ</h2>
           <div className="space-y-4">
             {types.map(key => {
               const t = TYPE_INFO[key]

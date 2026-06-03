@@ -14,12 +14,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "バーンアウト・セルフチェック | HITONE",
-  description: "あなたの燃え尽きタイプを科学的に分析。8分の無料チェックで、回復の道筋がわかります。Copenhagen Burnout InventoryとBCSQ-12に基づく31問の無料診断。",
-  keywords: ["バーンアウト", "燃え尽き症候群", "セルフチェック", "燃え尽き診断", "ストレスチェック", "バーンアウト診断", "燃え尽き タイプ"],
+  title: "隠れた強みセルフチェック | HITONE",
+  description: "あなたの「隠れた強み」を科学的に分析。8分の無料チェックで、頑張り方のタイプと強みの活かし方がわかります。Copenhagen Burnout InventoryとBCSQ-12に基づく31問の無料診断。",
+  keywords: ["隠れた強み", "セルフチェック", "強み診断", "タイプ診断", "ストレスチェック", "バーンアウト", "燃え尽き タイプ"],
   openGraph: {
-    title: "バーンアウト・セルフチェック | HITONE",
-    description: "あなたの燃え尽きタイプは？8分の無料チェックで科学的に分析",
+    title: "隠れた強みセルフチェック | HITONE",
+    description: "あなたの「隠れた強み」は？8分の無料チェックで科学的に分析",
     siteName: "HITONE",
     url: "https://burnout.hitone.app",
     type: "website",
