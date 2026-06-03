@@ -352,7 +352,7 @@ export default async function ReportViewPage({ params }: Props) {
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div>
             <p className="text-xs text-gray-400 tracking-wider">YOUR PERSONAL REPORT</p>
-            <h1 className="text-base font-bold text-gray-800">あなた専用の回復レポート</h1>
+            <h1 className="text-base font-bold text-gray-800">あなた専用の強みレポート</h1>
           </div>
           <div className="flex items-center gap-3">
             <div className="text-right">
@@ -514,7 +514,7 @@ export default async function ReportViewPage({ params }: Props) {
             {/* CTA */}
             <div className="p-5 sm:p-6 border-t border-gray-100">
               <p className="text-sm text-gray-700 leading-relaxed mb-2">
-                <span className="font-bold">みどり</span>は、あなたのタイプに合わせた回復プログラムを毎日ガイドするAIコーチです。
+                <span className="font-bold">みどり</span>は、あなたのタイプに合わせて、強みの活かし方を毎日ガイドするAIコーチです。
               </p>
               <p className="text-xs text-gray-500 leading-relaxed mb-4">
                 レポートの内容を理解した上で、あなたのペースに合わせて週ごとのテーマとマイクロタスクを提案します。調子が悪い日はペースを落とし、良い日は次のステップを提案します。
