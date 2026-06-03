@@ -351,7 +351,7 @@ export default async function ReportViewPage({ params }: Props) {
       <div className="py-6 px-4 border-b border-gray-100 bg-white">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div>
-            <p className="text-xs text-gray-400 tracking-wider">YOUR RECOVERY REPORT</p>
+            <p className="text-xs text-gray-400 tracking-wider">YOUR PERSONAL REPORT</p>
             <h1 className="text-base font-bold text-gray-800">あなた専用の回復レポート</h1>
           </div>
           <div className="flex items-center gap-3">
@@ -464,7 +464,7 @@ export default async function ReportViewPage({ params }: Props) {
               <span className="text-lg">🌿</span>
             </div>
             <div>
-              <p className="text-[10px] text-emerald-600 tracking-wider">RECOVERY COMPANION</p>
+              <p className="text-[10px] text-emerald-600 tracking-wider">YOUR COMPANION</p>
               <h2 className="text-base font-bold text-gray-800">みどりが、毎日寄り添います</h2>
             </div>
           </div>
@@ -540,7 +540,7 @@ export default async function ReportViewPage({ params }: Props) {
                 rel="noopener noreferrer"
                 className="group flex items-center justify-center gap-2 w-full px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-full transition-colors shadow-lg shadow-emerald-200/50"
               >
-                みどりと7日間無料で始める
+                強みの活かし方を、みどりと練習する（7日間無料）
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </a>
               <p className="text-[10px] text-gray-400 text-center mt-2">クレジットカード不要・いつでもやめられます</p>

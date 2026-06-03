@@ -56,8 +56,10 @@ export async function POST(req: NextRequest) {
 
   // Claude Sonnetでレポート生成
   try {
-    const typeName = TYPE_INFO[result.primary_type as BurnoutType]?.name ?? result.primary_type
-    const secondaryName = result.secondary_type ? (TYPE_INFO[result.secondary_type as BurnoutType]?.name ?? '') : 'なし'
+    const typeInfo = TYPE_INFO[result.primary_type as BurnoutType]
+    const typeName = typeInfo?.reportName ?? typeInfo?.name ?? result.primary_type
+    const secondaryInfo = result.secondary_type ? TYPE_INFO[result.secondary_type as BurnoutType] : null
+    const secondaryName = secondaryInfo ? (secondaryInfo.reportName ?? secondaryInfo.name) : 'なし'
 
     const anthropic = getAI()
     const response = await anthropic.messages.create({

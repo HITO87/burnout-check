@@ -60,7 +60,7 @@ export default async function ResultPage({ params }: Props) {
         <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${type.gradientFrom}cc, ${type.gradientTo}cc)` }} />
 
         <div className="max-w-lg mx-auto pt-12 pb-16 px-4 text-center relative z-10">
-          <p className="text-white/60 text-xs tracking-wider mb-6">YOUR BURNOUT PROFILE</p>
+          <p className="text-white/60 text-xs tracking-wider mb-6">YOUR STRENGTH PROFILE</p>
 
           {/* スコアゲージ */}
           <div className="relative w-36 h-36 mx-auto mb-6">
