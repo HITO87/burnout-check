@@ -43,7 +43,7 @@ export default function StartPage() {
 
         {/* CTA */}
         <Link
-          href="/check"
+          href="/strength"
           className="group inline-flex items-center gap-2 px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-full shadow-lg shadow-emerald-200/50 transition-all hover:shadow-xl"
         >
           詳しいチェックを始める
